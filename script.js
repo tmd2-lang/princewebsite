@@ -342,27 +342,41 @@ if (!reduceMotion) {
 }
 
 /* ---------- Small events: endless photo strip (Spread's) ----------
-   Move the row left by exactly half its width (= one full set) over 40s, forever. The modifier wraps x back into
-   0…−half, so after one set it snaps to 0, invisible because the second set looks exactly like the first.
-   Re-measured on resize (the photos change size at the breakpoints); paused while off screen. */
+   Move the row left by exactly one set's length over 40s, forever. The modifier wraps x back into 0…−set, so after
+   one set it snaps to 0, invisible because the second set looks exactly like the first.
+   - One set's length = the distance from the first photo to its copy (the first photo of the second set). Half the
+     row's width is NOT that: the row has one gap fewer than two full sets, so the wrap jumped 8px every loop.
+   - Rebuilt only when the screen WIDTH changes (the photos resize at the breakpoints). Phones fire "resize" every
+     time the address bar shows or hides while scrolling; rebuilding on those snapped the strip back to its start.
+     A rebuild keeps the current position, and stays paused if the section is off screen. */
 const strip = document.querySelector('#stripTrack');
 if (!reduceMotion) {
+  const photos = strip.children;
   let loop;
+  let onScreen = false;
+  let stripWidth = innerWidth;
+
   const buildStrip = () => {
+    const progress = loop ? loop.progress() : 0;
     if (loop) loop.kill();
     gsap.set(strip, { x: 0 });
-    const half = strip.scrollWidth / 2;
+    const set = photos[photos.length / 2].offsetLeft - photos[0].offsetLeft;
     loop = gsap.to(strip, {
-      x: -half,
+      x: -set,
       duration: 40,
       ease: 'none',
       repeat: -1,
-      modifiers: { x: gsap.utils.unitize(x => parseFloat(x) % half) },
+      paused: !onScreen,
+      modifiers: { x: gsap.utils.unitize(x => parseFloat(x) % set) },
     });
+    loop.progress(progress);
   };
   buildStrip();
+
   let stripTimer;
   addEventListener('resize', () => {
+    if (innerWidth === stripWidth) return;   // only the height changed (a phone's address bar): leave it running
+    stripWidth = innerWidth;
     clearTimeout(stripTimer);
     stripTimer = setTimeout(buildStrip, 200);
   });
@@ -370,7 +384,11 @@ if (!reduceMotion) {
     trigger: '#events',
     start: 'top bottom',
     end: 'bottom top',
-    onToggle: st => loop && (st.isActive ? loop.play() : loop.pause()),
+    onToggle: st => {
+      onScreen = st.isActive;
+      if (onScreen) loop.play();
+      else loop.pause();
+    },
   });
 }
 
