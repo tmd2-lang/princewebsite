@@ -1288,10 +1288,8 @@ html.js .plan.is-in:hover {
 
 /* ================= PULL-UP FOOTER (our Dosedrop build) =================
    <main> is the sheet: above the footer (z-index 1 vs 0), black, with a gap under it the footer's height and a
-   shadow on its bottom edge. The body is gold, so the gap shows the gold footer fixed underneath. */
-body {
-  background: var(--gold);
-}
+   shadow on its bottom edge. The gap shows the gold footer fixed underneath. The body stays black: browsers
+   paint the body color into the over-scroll bounce and Safari's toolbars, so a gold body framed the site. */
 main {
   position: relative;
   z-index: 1;
@@ -1313,11 +1311,13 @@ main {
   overflow: hidden;
   background: var(--gold);
   color: var(--charcoal);
-  transition: opacity .5s cubic-bezier(.4, 0, .2, 1);
+  transition: opacity .5s cubic-bezier(.4, 0, .2, 1), visibility .5s;
 }
-/* Hidden until the page starts lifting, so it can never peek through early (without JS it just stays visible). */
+/* Hidden until the page starts lifting, so it can never peek through early (without JS it just stays visible).
+   visibility as well as opacity, so Safari doesn't sample an invisible gold bar to tint its bottom toolbar. */
 html.js body:not([data-lifting="true"]) .footer {
   opacity: 0;
+  visibility: hidden;
 }
 .footer-row {
   display: flex;
