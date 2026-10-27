@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f0e0d">
+  <meta name="description" content="Wedding films by The Unkwn Wedding Palace. Your people. Your day. Feel it all again.">
+  <title>The Unkwn Wedding Palace — Wedding films</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231d1b18'/%3E%3Ctext x='5' y='24' fill='%23faf7f4' font-family='Arial' font-size='29'%3Eu%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=41">
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
+  <script src="assets/hls.min.js" defer></script>
+  <script src="script.js?v=21" defer></script>
+  <!-- Three.js as an ES module: the import map tells the browser where "three" and its add-ons live. -->
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="camera.js?v=12"></script>
+</head>
+<body>
+  <!-- Spread's centered glass navigation; the menu remains available when links fold away. -->
+  <nav class="nav" id="nav" aria-label="Main">
+    <a class="nav-logo" href="./">Unkwn Palace</a>
+    <ul class="nav-links">
+      <li><a href="#films" data-scroll-to>Films</a></li>
+      <li><a href="#pricing" data-scroll-to>Investment</a></li>
+    </ul>
+    <button class="menu-toggle" aria-haspopup="dialog" aria-controls="menu-dialog" aria-expanded="false">Menu <span aria-hidden="true">+</span></button>
+    <a class="nav-cta" href="#inquire" data-inquire>Inquire</a>
+  </nav>
+  <main>
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="hero-pin">
+
+        <!-- Floating gallery: hidden at first, rises past the shrinking hero card at different speeds. -->
+        <div class="hero-tiles" aria-hidden="true">
+          <div class="tile" style="--w:180px; --h:140px; top:6%;  left:4%;   --img:url(assets/frame-0.jpg?v=2)"></div>
+          <div class="tile" style="--w:160px; --h:200px; top:4%;  right:6%;  --img:url(assets/frame-1.jpg?v=2)"></div>
+          <div class="tile" style="--w:200px; --h:150px; top:42%; left:1%;   --img:url(assets/frame-2.jpg?v=2)"></div>
+          <div class="tile" style="--w:170px; --h:170px; top:50%; right:2%;  --img:url(assets/frame-3.jpg?v=2)"></div>
+          <div class="tile" style="--w:150px; --h:190px; bottom:6%; left:10%; --img:url(assets/frame-4.jpg?v=2)"></div>
+          <div class="tile" style="--w:190px; --h:140px; bottom:4%; right:8%; --img:url(assets/frame-5.jpg?v=2)"></div>
+          <div class="tile" style="--w:140px; --h:120px; top:20%; left:18%;  --img:url(assets/frame-6.jpg?v=2)"></div>
+          <div class="tile" style="--w:150px; --h:130px; top:18%; right:16%; --img:url(assets/frame-7.jpg?v=2)"></div>
+        </div>
+
+        <div class="hero-main" id="heroMain">
+          <video class="hero-media" id="background-video" muted autoplay loop playsinline poster="assets/poster.jpg" aria-hidden="true"></video>
+          <div class="hero-shade" aria-hidden="true"></div>
+
+          <!-- Centered like his current site: gold label, serif headline, one line. Buttons are Spread's. -->
+          <div class="hero-content" id="heroContent">
+            <p class="hero-eyebrow">The Unkwn Wedding Palace</p>
+            <h1 class="hero-title" id="hero-title" data-split>Your people. Your day.<br><em>Feel it all again.</em></h1>
+            <p class="hero-sub">Wedding films from Maryland to wherever you say “I do.”</p>
+            <div class="hero-actions">
+              <a class="btn btn-light" href="#films" data-scroll-to><span class="btn-fill" aria-hidden="true"></span><span class="btn-text">Watch the films</span></a>
+              <a class="btn-ghost" href="#inquire" data-inquire>Reserve your date <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </div>
+
+        <button id="pause-button" aria-label="Pause background video">Ⅱ Pause film</button>
+
+
+      </div>
+    </section>
+
+    <!-- ================= CAMERA =================
+         Dosedrop's capsule scene, told with a camera, on Dosedrop's timing. camera.js sets data-step on the section as
+         you scroll past each beat (measured in screens), and the CSS animates each step, so scrolling up reverses it:
+         1–2 the heading builds line by line while the camera peeks up from below, turning; 3 the heading zips up and
+         out; 4 the page flips to ivory and the first line arrives; 5–6 two more lines rise in, the block nudging up
+         each time, while the camera rises away out of the top. -->
+    <section class="camera-scene" id="camera" data-step="0">
+      <div class="camera-stage">
+        <canvas class="camera-canvas" id="cameraCanvas" aria-hidden="true"></canvas>
+        <!-- Viewfinder-style badge while the camera is on screen: blinking dot, REC, a timecode that follows the scroll. -->
+        <p class="camera-rec" aria-hidden="true"><span class="camera-rec-dot"></span>REC <span class="camera-rec-time">00:00:00:00</span></p>
+        <div class="camera-head">
+          <p class="tag">The art of remembering</p>
+          <h2 class="camera-title">The day will pass.<br><em class="camera-in camera-in--1">The feeling doesn’t have to.</em></h2>
+          <p class="camera-lead camera-in camera-in--2">There are moments you plan for, and moments you never see coming. A quiet look before the ceremony. Your family’s laughter. The way the room changes when the music starts.</p>
+        </div>
+        <div class="camera-more">
+          <p class="camera-more-line">Back to the vows.</p>
+          <p class="camera-more-line">Back to the first dance.</p>
+          <p class="camera-more-line">Back to everyone <em>who was there.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FILMS =================
+         His three wedding films in Spread's feature row (words on one side, a big card running to the
+         edge on the other), alternating sides. Each card plays its film silently while it's on screen;
+         "Watch with sound" opens the full player. -->
+    <!-- Films intro: the title card after the lights go down. -->
+    <header class="films-intro" id="films">
+      <p class="tag reveal">Curated services</p>
+      <h2 class="reveal">Three ways<br><em>to tell your story.</em></h2>
+      <p class="reveal">Traditional, modern or destination: every celebration gets a film made for it.</p>
+    </header>
+
+    <section class="feature">
+      <div class="feature-text">
+        <p class="tag reveal">Atlanta, Georgia</p>
+        <h2 class="reveal">Traditional <em>Wedding</em></h2>
+        <p class="reveal">The color, the culture and the ceremony of a traditional wedding, kept just the way it felt.</p>
+        <div class="feature-proof reveal">
+          <button class="btn-ghost" data-watch="https://theunkwnpalace.com/video/trad/output1.m3u8">Watch with sound <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+      <div class="feature-media">
+        <video class="feature-video" data-src="https://theunkwnpalace.com/video/trad/output1.m3u8" poster="assets/film-trad.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+      </div>
+    </section>
+
+    <section class="feature feature--flip">
+      <div class="feature-text">
+        <p class="tag reveal">Cincinnati, Ohio</p>
+        <h2 class="reveal">Modern <em>Wedding</em></h2>
+        <p class="reveal">A stylish, modern celebration, filmed with the same care the couple put into planning it.</p>
+        <div class="feature-proof reveal">
+          <button class="btn-ghost" data-watch="https://theunkwnpalace.com/video/mod/output2.m3u8">Watch with sound <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+      <div class="feature-media">
+        <video class="feature-video" data-src="https://theunkwnpalace.com/video/mod/output2.m3u8" poster="assets/film-mod.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+      </div>
+    </section>
+
+    <section class="feature">
+      <div class="feature-text">
+        <p class="tag reveal">Miami, Florida</p>
+        <h2 class="reveal">VIP &amp; Destination <em>Wedding</em></h2>
+        <p class="reveal">Full-day coverage for VIP and destination weddings, wherever the celebration takes you.</p>
+        <div class="feature-proof reveal">
+          <button class="btn-ghost" data-watch="https://theunkwnpalace.com/video/vip/output3.m3u8">Watch with sound <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+      <div class="feature-media">
+        <video class="feature-video" data-src="https://theunkwnpalace.com/video/vip/output3.m3u8" poster="assets/film-vip.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+      </div>
+    </section>
+
+    <!-- ================= MEET THE FILMMAKER =================
+         Spread's "control" card: a big rounded card that slides up over the films like a sheet laid on top.
+         Ivory instead of dark, the one light section on the page: the mood shifts from his work to him.
+         Copy is built from his own words (his FAQ and About), for him to approve. Photo: placeholder until we
+         have a real portrait of Prince. -->
+    <section class="filmmaker" id="filmmaker">
+      <div class="filmmaker-text">
+        <p class="tag reveal">Meet the filmmaker</p>
+        <h2 class="reveal">A personal story deserves <em>a personal approach.</em></h2>
+        <p class="filmmaker-lead reveal">I’m Prince, the filmmaker behind The Unkwn Wedding Palace. For more than eight years, videography has been my passion: weddings, private celebrations and elopements, close to home and wherever couples need me to travel.</p>
+        <p class="filmmaker-lead reveal">Bring me your vision, the shots you’ve pictured and the traditions that matter to you, and we’ll work closely together to film the day the way you’ll want to remember it.</p>
+        <ol class="steps reveal">
+          <li><span class="step-num">01</span><span class="step-title">8+ years</span><span class="step-desc">Behind the camera</span></li>
+          <li><span class="step-num">02</span><span class="step-title">I travel</span><span class="step-desc">Out of state and abroad</span></li>
+          <li><span class="step-num">03</span><span class="step-title">Your vision</span><span class="step-desc">Shots and styles on request</span></li>
+        </ol>
+        <a class="btn-ghost filmmaker-cta reveal" href="#inquire" data-inquire>Tell Prince about your day <span aria-hidden="true">→</span></a>
+      </div>
+      <!-- Placeholder: swap for <img src="assets/prince.jpg" alt="…"> once we have his photo. -->
+      <div class="filmmaker-photo" aria-hidden="true">
+        <span class="filmmaker-monogram">P</span>
+      </div>
+    </section>
+
+    <!-- ================= KIND WORDS =================
+         Our Wispr Flow testimonial "drum": seven cards in one row ride over an invisible cylinder as you scroll.
+         PLACEHOLDER QUOTES for the pitch only: invented names and words. Prince collects real reviews (with
+         the couples' OK) before any of this goes live. -->
+    <section class="voices" id="voices">
+      <div class="voices-head">
+        <p class="tag reveal">Kind words</p>
+        <h2 class="voices-title reveal">From the couples<br><em>who lived it.</em></h2>
+      </div>
+      <!-- The track is as tall as the scroll the drum needs; the stage inside it sticks to the screen. -->
+      <div class="voices-track" id="voicesTrack">
+        <div class="voices-stage" id="voicesStage">
+
+          <!-- 1. Gold, wide: names, place, quote; photo -->
+          <div class="vcard is-wide is-gold">
+            <div class="vcard-text">
+              <div class="vcard-names">Adaeze &amp; Tunde</div>
+              <div class="vcard-role">Married in Atlanta</div>
+              <p class="vcard-quote">“Prince made us forget the camera was even there. When we watched the film, we cried all over again.”</p>
+            </div>
+            <div class="vcard-photo">
+              <img src="assets/film-trad.jpg" alt="" loading="lazy">
+            </div>
+          </div>
+
+          <!-- 2. Ivory, square: short quote and a monogram -->
+          <div class="vcard is-square is-ivory">
+            <p class="vcard-quote">“Calm, organized and somehow everywhere at once. We never had to think about him, and he never missed a thing.”</p>
+            <div class="vcard-source"><span class="vcard-badge">MR</span>Monique R., bride</div>
+          </div>
+
+          <!-- 3. Full photo with a gold quote box over its lower half -->
+          <div class="vcard is-square is-photo">
+            <img class="vcard-bg" src="assets/still-fans.jpg" alt="" loading="lazy">
+            <div class="vcard-box">
+              <p class="vcard-quote">“Our families still talk about the highlight film. Every tradition, every dance, every face.”</p>
+              <div class="vcard-person"><b>Kemi &amp; David</b><span>Modern wedding</span></div>
+            </div>
+          </div>
+
+          <!-- 4. Sand, wide: photo on the left, quote on the right -->
+          <div class="vcard is-wide is-sand is-photo-left">
+            <div class="vcard-photo">
+              <img src="assets/frame-2.jpg" alt="" loading="lazy">
+            </div>
+            <div class="vcard-text">
+              <p class="vcard-quote">“He asked about our story before he ever talked about shots. You can feel that in every minute of the film.”</p>
+              <div class="vcard-person"><b>Jasmine &amp; Andre</b><span>Married in Maryland</span></div>
+            </div>
+          </div>
+
+          <!-- 5. Stone, square: short quote and a monogram -->
+          <div class="vcard is-square is-stone">
+            <p class="vcard-quote">“Delivered on time, and better than anything we imagined. We’ve already sent it to everyone who couldn’t make it.”</p>
+            <div class="vcard-source"><span class="vcard-badge">TW</span>Tiana W., bride</div>
+          </div>
+
+          <!-- 6. Ivory, wide: names, place, quote; photo -->
+          <div class="vcard is-wide is-ivory">
+            <div class="vcard-text">
+              <div class="vcard-names">Nia &amp; Marcus</div>
+              <div class="vcard-role">Destination wedding</div>
+              <p class="vcard-quote">“We flew him out for our wedding abroad. Best decision we made all year.”</p>
+            </div>
+            <div class="vcard-photo">
+              <img src="assets/film-vip.jpg" alt="" loading="lazy">
+            </div>
+          </div>
+
+          <!-- 7. Gold, wide: long quote on the left, photo on the right -->
+          <div class="vcard is-wide is-gold">
+            <div class="vcard-text">
+              <p class="vcard-quote">“I’ve watched our film more times than I can count. It sounds and feels exactly like that day.”</p>
+              <div class="vcard-person"><b>Simone &amp; Jordan</b><span>Married in Silver Spring</span></div>
+            </div>
+            <div class="vcard-photo">
+              <img src="assets/still-bride.jpg" alt="" loading="lazy">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INVESTMENT =================
+         Spread's pricing: headline left, reassurance right on the same baseline, then three cards that rise in
+         one by one. Spread's featured card is the dark one on a light page; on our black page it's flipped:
+         dark cards, and the popular one in ivory. His real packages and prices, from his current site. -->
+    <section class="pricing" id="pricing">
+      <div class="pricing-head">
+        <div>
+          <p class="tag reveal">Investment</p>
+          <h2 class="reveal">Choose the coverage <em>your day deserves.</em></h2>
+        </div>
+        <p class="reveal">Every package includes a full-length wedding film and highlight videos you can download and keep.</p>
+      </div>
+      <div class="plans" id="plans">
+        <article class="plan">
+          <p class="plan-tag">Intimate</p>
+          <h3 class="plan-name">Traditional / Elope</h3>
+          <p class="plan-desc">Ceremonies and elopements</p>
+          <p class="plan-price"><span class="plan-amt">$1,950</span></p>
+          <p class="plan-note">For smaller, shorter celebrations</p>
+          <ul class="plan-list">
+            <li>1–4 hours of coverage</li>
+            <li>One-hour wedding film</li>
+            <li>One-minute highlight video</li>
+            <li>Your films on a flash drive</li>
+          </ul>
+          <a class="plan-btn" href="#inquire" data-inquire="traditional">Get started</a>
+        </article>
+        <article class="plan plan--featured">
+          <p class="plan-tag">Most popular</p>
+          <h3 class="plan-name">Modern Wedding</h3>
+          <p class="plan-desc">The whole wedding day</p>
+          <p class="plan-price"><span class="plan-amt">$3,600</span></p>
+          <p class="plan-note">The package couples pick most</p>
+          <ul class="plan-list">
+            <li>8 hours of coverage</li>
+            <li>One-hour wedding film</li>
+            <li>Two-minute highlight video</li>
+            <li>Your films on a flash drive</li>
+          </ul>
+          <a class="plan-btn" href="#inquire" data-inquire="modern">Get started</a>
+        </article>
+        <article class="plan">
+          <p class="plan-tag">Full day</p>
+          <h3 class="plan-name">VIP &amp; Destination</h3>
+          <p class="plan-desc">Traditional and modern, anywhere</p>
+          <p class="plan-price"><span class="plan-amt">$9,000</span></p>
+          <p class="plan-note">Three videographers</p>
+          <ul class="plan-list">
+            <li>Full-day coverage, two-hour film</li>
+            <li>Creative director</li>
+            <li>TikTok or Reel on request</li>
+            <li>Drone footage</li>
+            <li>Four highlight videos</li>
+          </ul>
+          <a class="plan-btn" href="#inquire" data-inquire="vip">Get started</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= SMALL EVENTS =================
+         Spread's photo strip ("Made to fit around your life"): a centered head, then a row of tall photos that
+         slides left forever. One photo says "a party"; a row says "all of this", which is the point: range.
+         The set is in the HTML twice, so the loop can wrap without a visible jump (script.js).
+         Photos from Pexels, credited in the footer. -->
+    <section class="strip" id="events">
+      <div class="strip-head">
+        <p class="tag reveal">Small events, brand shoots &amp; lifestyle</p>
+        <h2 class="reveal">Not just weddings. <em>Every celebration.</em></h2>
+        <p class="reveal">Birthdays, intimate gatherings, brand shoots and corporate events, filmed with the same care as a wedding day.</p>
+        <a class="btn btn-light reveal" href="#inquire" data-inquire="event"><span class="btn-fill" aria-hidden="true"></span><span class="btn-text">Get started</span></a>
+      </div>
+      <div class="strip-track" id="stripTrack">
+          <div class="strip-img"><img src="assets/strip/birthday-cake.jpg" alt="A woman holding a birthday cake beside balloons"></div>
+          <div class="strip-img"><img src="assets/strip/studio-red.jpg" alt="A model on a red studio set with a light"></div>
+          <div class="strip-img"><img src="assets/strip/family-toast.jpg" alt="A family in kente raising their glasses"></div>
+          <div class="strip-img"><img src="assets/strip/speaker.jpg" alt="A speaker at a podium under purple stage light"></div>
+          <div class="strip-img"><img src="assets/strip/black-tie.jpg" alt="A couple in black tie at an evening event"></div>
+          <div class="strip-img"><img src="assets/strip/birthday-family.jpg" alt="A family blowing out birthday candles"></div>
+          <div class="strip-img"><img src="assets/strip/studio-dark.jpg" alt="A woman posing in a dark studio"></div>
+          <div class="strip-img"><img src="assets/strip/new-year-dinner.jpg" alt="Friends at a New Year dinner under gold balloons"></div>
+          <div class="strip-img"><img src="assets/strip/couple.jpg" alt="A couple embracing, close up"></div>
+          <div class="strip-img"><img src="assets/strip/gown.jpg" alt="A woman in a black evening gown"></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/birthday-cake.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/studio-red.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/family-toast.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/speaker.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/black-tie.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/birthday-family.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/studio-dark.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/new-year-dinner.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/couple.jpg" alt=""></div>
+          <div class="strip-img" aria-hidden="true"><img src="assets/strip/gown.jpg" alt=""></div>
+      </div>
+    </section>
+
+    <!-- ================= QUESTIONS =================
+         Our Dosedrop (Script Runner) FAQ: headline left, questions right as soft rounded rows. Pure HTML:
+         each row is a native <details>, so open/close, keyboard and screen readers work with no script.
+         His five questions and answers from his current site, lightly cleaned up. -->
+    <section class="faq" id="faq">
+      <div class="faq-head">
+        <p class="tag reveal">Questions</p>
+        <h2 class="faq-title reveal">Good questions.<br><em>Honest answers.</em></h2>
+        <p class="faq-sub reveal">The things couples ask most, answered by Prince.</p>
+      </div>
+      <div class="faq-list">
+        <details class="qa">
+          <summary><h3>Do you take pictures as well?</h3><svg class="qa-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/><path class="qa-vbar" d="M12 6v12"/></svg></summary>
+          <div class="qa-a"><p>Yes, but videography and cinematography are my passion. I can recommend several great photographers I’ve worked with, and you’ll love them.</p></div>
+        </details>
+        <details class="qa">
+          <summary><h3>Do you only film weddings?</h3><svg class="qa-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/><path class="qa-vbar" d="M12 6v12"/></svg></summary>
+          <div class="qa-a"><p>Not at all. I also film brands, birthdays, events, lifestyle and more.</p></div>
+        </details>
+        <details class="qa">
+          <summary><h3>Do you film destination weddings?</h3><svg class="qa-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/><path class="qa-vbar" d="M12 6v12"/></svg></summary>
+          <div class="qa-a"><p>Yes, I travel for weddings. I also specialize in private weddings and elopements.</p></div>
+        </details>
+        <details class="qa">
+          <summary><h3>Can we request specific shots or styles?</h3><svg class="qa-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/><path class="qa-vbar" d="M12 6v12"/></svg></summary>
+          <div class="qa-a"><p>Absolutely. Share your vision and preferences with me, and we’ll work closely together to capture the moments and atmosphere you want.</p></div>
+        </details>
+        <details class="qa">
+          <summary><h3>What’s included in wedding videography?</h3><svg class="qa-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/><path class="qa-vbar" d="M12 6v12"/></svg></summary>
+          <div class="qa-a"><p>Every package includes a full-length wedding film and highlight videos you can download and keep. Hours of coverage, crew and extras like drone footage depend on the package; the details are in Investment above.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ================= CLOSING =================
+         Spread's photo-break card ("Deals land while you sleep"): starts edge to edge and pulls in to a rounded
+         card as it arrives, his VIP film playing softly behind a dark wash. The last thing on the page is the
+         one thing we want people to do. -->
+    <section class="photo-break" id="reserve">
+      <video class="photo-break-img feature-video" data-src="https://theunkwnpalace.com/video/vip/output3.m3u8" poster="assets/film-vip.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+      <div class="photo-break-overlay">
+        <h2 class="reveal">Some moments deserve<br><em>more than a memory.</em></h2>
+        <p class="reveal">Tell Prince about your day, and he’ll be in touch about your date, your coverage and the film you have in mind.</p>
+        <div class="reveal">
+          <a class="btn btn-light" href="#inquire" data-inquire><span class="btn-fill" aria-hidden="true"></span><span class="btn-text">Reserve your date</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER =================
+       Our Dosedrop "pull-up" footer: it's fixed to the bottom of the screen BEHIND the page. <main> is a black
+       sheet with a gap under it the footer's height, so on the last scroll the page lifts off and reveals it.
+       His gold underneath everything, with the business name in giant type. -->
+  <footer class="footer" id="footer">
+    <div class="footer-row">
+      <div class="footer-left">
+        <p>© 2026 The Unkwn Wedding Palace</p>
+        <p>Silver Spring, Maryland · Weddings everywhere</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a class="flink" href="#films" data-scroll-to>Films</a>
+        <a class="flink" href="#pricing" data-scroll-to>Investment</a>
+        <a class="flink" href="#faq" data-scroll-to>Questions</a>
+        <a class="flink" href="https://www.instagram.com/unkwnweddingpalace" target="_blank" rel="noopener">Instagram</a>
+        <a class="flink" href="https://www.youtube.com/@UnkwnWeddingPalace" target="_blank" rel="noopener">YouTube</a>
+        <a class="flink" href="https://www.tiktok.com/@unkwnweddingpalac" target="_blank" rel="noopener">TikTok</a>
+      </nav>
+    </div>
+    <p class="footer-credits">Event photos on Pexels by Larissa Viana, Matheus Bertelli, Greta Hoffman, Su Casa Panamá, Ansey Photography, PNW Production, Dellon Thomas, Katrin Bolovtsova, _brunovisual and bigmass media and printing.</p>
+    <!-- Giant wordmark: SVG text stretched to an exact width with textLength, so it spans edge to edge in any font. -->
+    <svg class="footer-mark" viewBox="0 0 1440 220" aria-hidden="true">
+      <text x="24" y="196" textLength="1392" lengthAdjust="spacingAndGlyphs">Unkwn Palace</text>
+    </svg>
+  </footer>
+  <!-- Native dialogs provide focus containment and Escape dismissal. -->
+  <!-- ================= MENU =================
+       Full-screen menu in the site's own look: black, big serif links with gold numbers, the film preview on the right.
+       Every link goes somewhere on this page (or opens the inquiry panel). Native <dialog>: focus stays inside,
+       Escape closes it. data-lenis-prevent (on all three panels): while a panel is open Lenis is paused, and a paused
+       Lenis swallows every swipe and wheel event on the page; this attribute tells it to leave the panel's own
+       scrolling alone, so a form taller than the screen can still scroll. -->
+  <dialog id="menu-dialog" class="menu-dialog" aria-label="Main menu" data-lenis-prevent>
+    <div class="menu-header">
+      <a class="wordmark" href="./">Unkwn Palace</a>
+      <button class="close-menu" autofocus>Close <span aria-hidden="true">×</span></button>
+    </div>
+    <div class="menu-body">
+      <nav class="menu-links" aria-label="Explore">
+        <a href="#films" data-scroll-to><small>01</small><span>The films</span></a>
+        <a href="#filmmaker" data-scroll-to><small>02</small><span>Meet <em>Prince</em></span></a>
+        <a href="#pricing" data-scroll-to><small>03</small><span>Investment</span></a>
+        <a href="#faq" data-scroll-to><small>04</small><span>Questions</span></a>
+        <a href="#inquire" data-inquire><small>05</small><span><em>Inquire</em></span></a>
+      </nav>
+      <button class="menu-preview" data-watch aria-label="Watch the wedding film">
+        <img src="assets/poster.jpg" alt="">
+        <span class="preview-caption"><span>Some days stay <em>with you.</em></span><span class="preview-play" aria-hidden="true">▶ Watch</span></span>
+      </button>
+    </div>
+    <footer class="menu-footer">
+      <span>The Unkwn Wedding Palace · Silver Spring, Maryland</span>
+      <div>
+        <a href="https://www.instagram.com/unkwnweddingpalace" target="_blank" rel="noopener">Instagram ↗</a>
+        <a href="https://www.youtube.com/@UnkwnWeddingPalace" target="_blank" rel="noopener">YouTube ↗</a>
+        <a href="https://www.tiktok.com/@unkwnweddingpalac" target="_blank" rel="noopener">TikTok ↗</a>
+      </div>
+    </footer>
+  </dialog>
+
+  <!-- ================= INQUIRE =================
+       In-house inquiry form in a full-screen panel, so nobody leaves the site. Every Inquire / Reserve / Get started
+       button opens it; the pricing buttons pre-select their package. Concept site: submitting shows the thank-you
+       screen only. For the real site, point the form at his email or HoneyBook. -->
+  <dialog id="inquire-dialog" class="inquire-dialog" aria-labelledby="inquire-title" data-lenis-prevent>
+    <div class="menu-header">
+      <a class="wordmark" href="./">Unkwn Palace</a>
+      <button class="close-inquire" autofocus>Close <span aria-hidden="true">×</span></button>
+    </div>
+    <div class="inquire-body">
+      <div class="inquire-intro">
+        <p class="tag">Inquire</p>
+        <h2 id="inquire-title">Tell Prince<br><em>about your day.</em></h2>
+        <p class="inquire-lead">Share a few details and he’ll be in touch about your date, your coverage and the film you have in mind.</p>
+        <ol class="inquire-steps">
+          <li><span>01</span>Send your details</li>
+          <li><span>02</span>A short call with Prince</li>
+          <li><span>03</span>Reserve your date</li>
+        </ol>
+      </div>
+
+      <form class="inquire-form" id="inquireForm">
+        <div class="field field--wide">
+          <label for="f-names">Your names</label>
+          <input id="f-names" name="names" type="text" autocomplete="name" placeholder="Ama &amp; Kofi" required>
+        </div>
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@email.com" required>
+        </div>
+        <div class="field">
+          <label for="f-phone">Phone <small>optional</small></label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="(301) 555-0123">
+        </div>
+        <div class="field">
+          <label for="f-date">Wedding date</label>
+          <input id="f-date" name="date" type="date" required>
+        </div>
+        <div class="field">
+          <label for="f-venue">Venue or city</label>
+          <input id="f-venue" name="venue" type="text" placeholder="Silver Spring, MD">
+        </div>
+        <div class="field field--wide">
+          <label for="f-guests">Guests, roughly</label>
+          <select id="f-guests" name="guests">
+            <option value="">Choose one</option>
+            <option>Under 50</option>
+            <option>50–150</option>
+            <option>150–300</option>
+            <option>300+</option>
+          </select>
+        </div>
+        <fieldset class="field field--wide">
+          <legend>Package</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="package" value="traditional"><span>Traditional / Elope</span></label>
+            <label class="choice"><input type="radio" name="package" value="modern"><span>Modern Wedding</span></label>
+            <label class="choice"><input type="radio" name="package" value="vip"><span>VIP &amp; Destination</span></label>
+            <label class="choice"><input type="radio" name="package" value="event"><span>Small event or brand</span></label>
+            <label class="choice"><input type="radio" name="package" value="unsure" checked><span>Not sure yet</span></label>
+          </div>
+        </fieldset>
+        <div class="field field--wide">
+          <label for="f-message">Tell us about your day</label>
+          <textarea id="f-message" name="message" rows="4" placeholder="The people, the traditions, the moments you can’t wait for…"></textarea>
+        </div>
+        <div class="form-actions field--wide">
+          <button class="btn btn-light" type="submit"><span class="btn-fill" aria-hidden="true"></span><span class="btn-text">Send inquiry</span></button>
+          <p class="form-note">Prince replies personally by email.</p>
+        </div>
+      </form>
+
+      <div class="inquire-thanks" id="inquireThanks" hidden>
+        <p class="tag">Inquiry sent</p>
+        <h2 tabindex="-1">Thank you, <em data-thanks-name>both</em>.</h2>
+        <p class="inquire-lead">Prince will be in touch soon about your date. In the meantime, the films are a good place to start.</p>
+        <button class="btn btn-light close-inquire"><span class="btn-fill" aria-hidden="true"></span><span class="btn-text">Back to the site</span></button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="film-dialog" class="film-dialog" aria-label="Wedding film" data-lenis-prevent>
+    <div class="film-heading"><span>THE UNKWN WEDDING PALACE / WEDDING FILM</span><button id="close-film" autofocus>Close <span aria-hidden="true">×</span></button></div>
+    <video id="film-video" controls playsinline preload="none" poster="assets/poster.jpg"></video>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,2246 @@
+/* Training 01: Spread's hero motion and glass nav, dressed in his current site's black and gold. */
+:root {
+  /* Warm neutrals: every grey leans brown, never blue. */
+  --cream: #faf7f4;          /* page */
+  --stone: #f2ede7;          /* cards, button hover fill */
+  --sand: #e6dfd5;
+  --charcoal: #1d1b18;       /* text + dark sections: a warm near-black, never #000 */
+  --charcoal-soft: #3a3632;  /* body copy */
+  --muted: #8c857d;
+  --muted-light: #b5afa7;
+  --border: #ddd6cc;
+  --positive: #3d6b4f;       /* the only accent: money / profit */
+  --positive-bg: #3d6b4f10;  /* the same green at ~6% for pill backgrounds */
+
+  /* From his current site: a near-black page and one muted gold, used sparingly. */
+  --night: #0f0e0d;          /* page: his #0f0f0f, nudged warm */
+  --gold: #c4a661;           /* measured from his eyebrow */
+
+  --font-head: "General Sans", system-ui, sans-serif;   /* headings: weight 500, tight tracking */
+  --font-body: "General Sans", system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif;  /* hero headline only: tall, narrow, film-poster feel */
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);      /* expo-out: Spread's house easing */
+  --ease-text: cubic-bezier(0.215, 0.61, 0.355, 1); /* "power3.out" for text entrances */
+
+  --pad-x: 56px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: var(--night);
+  color: var(--cream);
+  font: 400 16px/1.6 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+a {
+  color: inherit;
+}
+
+/* Lenis (smooth scroll) recommended base styles: let Lenis own the scrolling. */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ================= NAV ================= */
+.nav {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  translate: -50% 0;            /* centered without a wrapper */
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 620px;
+  padding: 8px 8px 8px 28px;
+  border-radius: 100px;
+  /* Dark glass over the photo */
+  background: rgba(29, 27, 24, 0.15);
+  -webkit-backdrop-filter: blur(32px) saturate(1.4);
+  backdrop-filter: blur(32px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition:
+    background .4s, border-color .4s, box-shadow .4s,
+    padding .5s var(--ease-out), max-width .5s var(--ease-out);
+  animation: nav-in .6s ease-out .2s both;
+}
+@keyframes nav-in { from {
+  opacity: 0;
+} }
+
+.nav-logo {
+  font: 500 17px/1 var(--font-head);
+  letter-spacing: -0.4px;
+  color: #fff;
+  text-decoration: none;
+  margin-right: 16px;
+  flex-shrink: 0;
+  transition: color .4s, margin .4s;
+}
+
+/* The links collapse by animating max-width to 0. You can't transition `width: auto`,
+   but you CAN transition max-width between two fixed numbers. overflow: hidden hides the rest. */
+.nav-links {
+  display: flex;
+  list-style: none;
+  overflow: hidden;
+  max-width: 400px;
+  transition: max-width .5s var(--ease-out), opacity .3s;
+}
+.nav-links a {
+  display: block;
+  padding: 10px 16px;
+  border-radius: 100px;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .3s, background .3s;
+}
+.nav-links a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-cta {
+  flex-shrink: 0;
+  margin-left: 4px;
+  padding: 11px 24px;
+  border-radius: 100px;
+  background: #fff;
+  color: var(--charcoal);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .3s, color .3s, padding .3s, font-size .3s, opacity .3s;
+}
+.nav-cta:hover {
+  opacity: .88;
+}
+.cta-short {
+  display: none;
+}
+
+/* Scrolled: links fold away and the glass darkens so it reads over the black page and the stills. */
+.nav.scrolled {
+  max-width: 280px;
+  gap: 2px;
+  padding: 6px 6px 6px 20px;
+  background: rgba(15, 14, 13, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
+}
+.nav.scrolled .nav-logo {
+  margin-right: auto;
+}
+.nav.scrolled .nav-links {
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.nav.scrolled .nav-cta {
+  padding: 9px 18px;
+  font-size: 12px;
+}
+
+.nav a:focus-visible, .btn:focus-visible, .btn-ghost:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ================= HERO ================= */
+/* The track is 200vh tall; the stage inside sticks to the screen for the first 100vh of scrolling.
+   That "extra" 100vh of scroll is the timeline script.js turns into motion. */
+.hero {
+  position: relative;
+  height: 200vh;
+}
+.hero-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* The big media layer. JS scales it down (1 → 0.25) and rounds its corners. */
+.hero-main {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  background: var(--night);
+  will-change: transform;
+}
+/* Use the business's actual wedding footage instead of the practice photo. */
+.hero-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 58% center;
+}
+/* Centered text sits over the footage, so the whole frame dims a little (like his current site's overlay)
+   and the lower half dims more, where the headline and button are. */
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top,
+      rgba(15, 14, 13, 0.85) 0%,
+      rgba(15, 14, 13, 0.5) 50%,
+      rgba(15, 14, 13, 0) 85%),
+    rgba(15, 14, 13, 0.22);
+}
+
+/* Centered column, sitting low so the couple's faces stay clear. */
+.hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 var(--pad-x) clamp(72px, 11vh, 110px);
+  text-align: center;
+  color: #fff;
+}
+/* Gold label: his site's 14px capitals with very wide spacing (4.2px = 0.3em). */
+.hero-eyebrow {
+  margin-bottom: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+/* Instrument Serif is tall and narrow, so it runs bigger than the 72px sans did to carry the same weight.
+   It has one weight (400): the contrast comes from the italic second line, not from bolding. */
+.hero-title {
+  font: 400 clamp(56px, 7.4vw, 104px)/0.98 var(--font-display);
+  letter-spacing: -0.02em;
+  margin-bottom: 22px;
+}
+.hero-title em {
+  font-style: italic;
+}
+/* One quiet line instead of a paragraph: the footage does the selling. */
+.hero-sub {
+  margin-bottom: 40px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.72);
+  text-wrap: balance;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ---- Word-mask reveal ----
+   Each word sits in a box with overflow: hidden (the "mask"). The word starts pushed below the box,
+   so it's invisible, then slides up into view. It looks like the text rises out of a slot. */
+.w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 6px;          /* room for descenders (p, g) so the mask doesn't cut them */
+}
+.w > span {
+  display: inline-block;
+}
+
+/* Start state (hidden) and end state (shown). The end state is MORE specific (html.js.ready = 2 classes
+   on html) than the start state (html.js = 1), so it always wins once .ready is added. */
+html.js .w > span {
+  transform: translateY(125%);
+}
+html.js .hero-eyebrow {
+  opacity: 0;
+}
+html.js .hero-sub {
+  opacity: 0;
+  transform: translateY(30px);
+}
+html.js .hero-actions {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+html.js.ready .w > span {
+  transform: none;
+  transition: transform 1.2s var(--ease-text) calc(.3s + var(--i) * 60ms);
+}
+html.js.ready .hero-eyebrow {
+  opacity: 1;
+  transition: opacity 1s var(--ease-text) .1s;
+}
+html.js.ready .hero-sub {
+  opacity: 1; transform: none;
+  transition: opacity 1s var(--ease-text) 1s, transform 1s var(--ease-text) 1s;
+}
+html.js.ready .hero-actions {
+  opacity: 1; transform: none;
+  transition: opacity .8s var(--ease-text) 1.2s, transform .8s var(--ease-text) 1.2s;
+}
+
+/* ---- Buttons (Spread's) ---- */
+.btn {
+  position: relative;
+  isolation: isolate;          /* new stacking context: the fill's z-index -1 stays INSIDE the button */
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  text-decoration: none;
+}
+.btn-light {
+  padding: 16px 36px;
+  background: #fff;
+  color: var(--charcoal);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+}
+/* Hover: a second color wipes in from the left (scaleX 0 → 1 with the origin on the left). */
+.btn-fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--stone);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .5s var(--ease-out);
+}
+.btn:hover .btn-fill {
+  transform: scaleX(1);
+}
+.btn:active {
+  scale: .98;
+}
+
+.btn-ghost {
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  transition: color .3s;
+}
+.btn-ghost span {
+  display: inline-block;
+  transition: transform .3s var(--ease-out);
+}
+.btn-ghost:hover {
+  color: #fff;
+}
+.btn-ghost:hover span {
+  transform: translateX(3px);
+}
+
+/* ---- Floating gallery tiles ---- */
+.hero-tiles {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.tile {
+  position: absolute;
+  width: var(--w);
+  height: var(--h);
+  border-radius: 14px;
+  background: var(--img) center / cover;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+
+/* ================= CAMERA (Dosedrop's capsule scene, on Dosedrop's timing) =================
+   The section is tall (390vh: about three screens of scrolling plus the pinned one); the stage sticks to the screen.
+   camera.js writes data-step = how many beats you've scrolled past; every rule below keys off it, so each step is a
+   plain CSS transition and scrolling back up plays it in reverse. */
+.camera-scene {
+  position: relative;
+  height: 390vh;
+  background: var(--night);
+  transition: background-color 1s cubic-bezier(.4, 0, .2, 1);
+}
+/* Step 4+: the flip to ivory (Dosedrop's orange → white). */
+.camera-scene[data-step="4"],
+.camera-scene[data-step="5"],
+.camera-scene[data-step="6"] {
+  background: var(--cream);
+}
+.camera-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+.camera-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* REC badge: top left, like the corner of a viewfinder. Shown while the camera is on screen (steps 1–5);
+   white on black, charcoal once the page is ivory. The dot blinks on the same 0.6s on / 0.4s off rhythm as the
+   camera's tally light. */
+.camera-rec {
+  position: absolute;
+  top: 110px;
+  left: var(--pad-x);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  font-variant-numeric: tabular-nums;   /* every digit the same width, so the timecode doesn't wobble */
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  transition: opacity .5s ease, color 1s ease;
+}
+.camera-scene:is([data-step="1"], [data-step="2"], [data-step="3"], [data-step="4"], [data-step="5"]) .camera-rec {
+  opacity: 1;
+}
+.camera-scene:is([data-step="4"], [data-step="5"], [data-step="6"]) .camera-rec {
+  color: rgba(29, 27, 24, 0.7);
+}
+.camera-rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff2a1a;
+  box-shadow: 0 0 8px rgba(255, 42, 26, 0.7);
+  animation: rec-blink 1s steps(1, end) infinite;
+}
+@keyframes rec-blink {
+  60% {
+    opacity: 0;
+  }
+}
+
+/* The heading sits near the top (Dosedrop: 128px down), so the camera has the lower part of the screen to rise into. */
+.camera-head {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  width: min(860px, 100% - 2 * var(--pad-x));
+  translate: -50% 0;
+  text-align: center;
+  transition: translate .45s cubic-bezier(.33, 1, .68, 1);
+}
+/* Step 3+: it zips up out of the stage (its own height plus its offset), like Dosedrop's. */
+.camera-scene:is([data-step="3"], [data-step="4"], [data-step="5"], [data-step="6"], [data-step="7"]) .camera-head {
+  translate: -50% calc(-100% - 140px);
+}
+.camera-title {
+  margin-bottom: 22px;
+  font: 400 clamp(44px, 5.4vw, 80px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.camera-title em {
+  display: inline-block;
+  font-style: italic;
+}
+.camera-lead {
+  max-width: 580px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+  text-wrap: balance;
+}
+/* The heading builds in beats: the italic line at step 1, the paragraph at step 2. */
+.camera-in {
+  opacity: 0;
+  translate: 0 24px;
+  transition: opacity .5s ease, translate .6s var(--ease-text);
+}
+.camera-scene:not([data-step="0"]) .camera-in--1,
+.camera-scene:not([data-step="0"]):not([data-step="1"]) .camera-in--2 {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* The three lines after the camera: a box anchored by its bottom edge. Each step shows one more line and nudges the
+   box up (Dosedrop: 10% → 20% → 40% of the screen); new lines rise 200px into place. */
+.camera-more {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(960px, 100% - 2 * var(--pad-x));
+  translate: -50% 0;
+  opacity: 0;
+  text-align: center;
+  transition: bottom .55s cubic-bezier(.25, .7, .35, 1), opacity .3s ease;
+}
+.camera-more-line {
+  font: 400 clamp(40px, 5vw, 72px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--charcoal);
+  transition: color 1s cubic-bezier(.4, 0, .2, 1);
+}
+/* Step 7, "the lights go down": the page fades back to black (step 7 isn't in the ivory rule above) and the lines
+   turn white, so the section hands off to the films with no edge, like a theatre dimming before the film. */
+.camera-scene[data-step="7"] .camera-more-line {
+  color: #fff;
+}
+.camera-more-line em {
+  font-style: italic;
+}
+.camera-more-line:not(:first-child) {
+  opacity: 0;
+  translate: 0 200px;
+  transition: opacity .33s cubic-bezier(.42, 0, .58, 1), translate .33s cubic-bezier(.42, 0, .58, 1), color 1s cubic-bezier(.4, 0, .2, 1);
+}
+.camera-scene[data-step="4"] .camera-more {
+  opacity: 1;
+  bottom: 12%;
+}
+.camera-scene[data-step="5"] .camera-more {
+  opacity: 1;
+  bottom: 24%;
+}
+.camera-scene:is([data-step="6"], [data-step="7"]) .camera-more {
+  opacity: 1;
+  bottom: 38%;
+}
+.camera-scene:is([data-step="5"], [data-step="6"], [data-step="7"]) .camera-more-line:nth-child(2),
+.camera-scene:is([data-step="6"], [data-step="7"]) .camera-more-line:nth-child(3) {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* ================= FILMS INTRO =================
+   A proper opener for the films, centred with lots of air: the camera scene ends with the lights going down, and
+   this is the title card before the first film. */
+.films-intro {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 100px var(--pad-x) 60px;
+  text-align: center;
+}
+.films-intro h2 {
+  margin-bottom: 20px;
+  font: 400 clamp(48px, 6vw, 88px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.films-intro h2 em {
+  font-style: italic;
+}
+.films-intro > p:not(.tag) {
+  max-width: 460px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  text-wrap: balance;
+}
+
+/* ================= FILMS (Spread's feature row, three times, alternating) =================
+   His films are shot wide (16:9), so unlike Spread's tall 4:5 photo the card keeps the whole frame.
+   A wide card needs room: the film gets 60% of the row, the text 40% (still capped at 480px). */
+.feature {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  align-items: center;
+  min-height: 72vh;
+  padding: 56px 0;              /* room between the films, so each one gets its own moment */
+}
+.feature-text {
+  max-width: 480px;
+  padding: 80px var(--pad-x);
+}
+/* Small label: Spread's 12px capitals, in his gold. */
+.tag {
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.feature h2 {
+  margin-bottom: 20px;
+  font: 400 clamp(36px, 4vw, 56px)/1.02 var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;           /* even line lengths in the headline */
+}
+.feature h2 em {
+  font-style: italic;
+}
+.feature-text > p:not(.tag) {
+  margin-bottom: 28px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.7);
+}
+/* Spread's proof line: a hairline, then one quiet action under it. */
+.feature-proof {
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* Film card: 16:9, pushed to the right edge with a 20px margin (Spread's edge-running card). */
+.feature-media {
+  position: relative;
+  overflow: hidden;
+  width: calc(100% - 40px);
+  aspect-ratio: 16 / 9;
+  margin: 20px 20px 20px auto;
+  border-radius: 20px;
+  background: #1a1816;          /* shows while the photo loads */
+}
+.feature-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Flipped row: film left, text right. `order` swaps the visual order without changing the HTML order,
+   so screen readers still get the text first. The column widths flip with it. */
+.feature--flip {
+  grid-template-columns: 3fr 2fr;
+}
+.feature--flip .feature-text {
+  order: 2;
+  padding: 80px var(--pad-x) 80px 32px;
+}
+.feature--flip .feature-media {
+  order: 1;
+  margin: 20px auto 20px 20px;
+}
+
+/* ================= MEET THE FILMMAKER (Spread's slide-over card) =================
+   margin-top: -100px pulls the card up over the films; z-index + an UPWARD shadow make it read as a sheet
+   laid on top. script.js also slides it up 120px as it arrives. The last film row gets extra room below
+   so the overlap lands on empty space, never on the film. */
+.feature:has(+ .filmmaker) {
+  padding-bottom: 140px;
+}
+.filmmaker {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: calc(100% - 24px);
+  min-height: 100vh;
+  margin: -100px auto 12px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--cream);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.45);
+  color: var(--charcoal);
+}
+.filmmaker-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 64px;
+}
+/* His gold is too pale to read on ivory (about 2:1), so the label uses a deeper shade of it. */
+.filmmaker .tag {
+  color: #8f7333;
+}
+.filmmaker h2 {
+  max-width: 480px;
+  margin-bottom: 24px;
+  font: 400 clamp(40px, 4.4vw, 64px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.filmmaker h2 em {
+  font-style: italic;
+}
+.filmmaker-lead {
+  max-width: 440px;
+  margin-bottom: 18px;
+  line-height: 1.7;
+  color: var(--charcoal-soft);
+  text-wrap: pretty;
+}
+
+/* Spread's numbered steps: equal columns split by hairlines. */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 480px;
+  margin: 30px 0 36px;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+.steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 16px 0 0;
+}
+.steps li + li {
+  padding-left: 16px;
+  border-left: 1px solid var(--border);
+}
+.step-num {
+  font-size: 11px;
+  color: var(--muted);
+}
+.step-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+.step-desc {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.filmmaker .btn-ghost {
+  align-self: flex-start;       /* hug the text instead of stretching across the column */
+  color: var(--charcoal);
+}
+.filmmaker .btn-ghost:hover {
+  color: #8f7333;
+}
+
+/* Photo side. Until we have Prince's portrait: a warm stone panel with a faint serif monogram. */
+.filmmaker-photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--sand);
+}
+.filmmaker-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.filmmaker-monogram {
+  font: italic 400 clamp(160px, 20vw, 320px)/1 var(--font-display);
+  color: rgba(29, 27, 24, 0.08);
+}
+
+/* ================= KIND WORDS (our Wispr Flow testimonial drum) =================
+   The stage sticks to the screen while the track scrolls past; script.js places every card along one row
+   and tilts it around a point behind it. Card sizes and corners are Wispr's; colors are his ivory, gold
+   and sand. Light cards on the black page, so each one reads as an object you could pick up. */
+.voices {
+  position: relative;
+}
+.voices-head {
+  padding: 140px var(--pad-x) 0;
+  text-align: center;
+}
+.voices-title {
+  font: 400 clamp(44px, 5.2vw, 76px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.voices-title em {
+  font-style: italic;
+}
+.voices-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: clip;
+}
+.vcard {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 460px;
+  overflow: hidden;
+  border-radius: 48px;
+  color: var(--charcoal);
+  translate: -50% -50%;
+  backface-visibility: hidden;   /* a card tipped past 90° shows nothing, not its mirrored back */
+}
+.is-ivory {
+  background: var(--cream);
+}
+.is-gold {
+  background: var(--gold);
+}
+.is-sand {
+  background: var(--sand);
+}
+.is-stone {
+  background: var(--stone);
+}
+
+/* Wide card: text column + a 322px photo. */
+.vcard.is-wide {
+  display: grid;
+  grid-template-columns: 1fr 322px;
+  gap: 48px;
+  width: 740px;
+  padding: 16px 16px 16px 32px;
+}
+.vcard.is-photo-left {
+  grid-template-columns: 354px 1fr;
+  padding: 16px 32px 16px 16px;
+}
+.vcard-text {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+}
+.vcard-quote {
+  font: 400 34px/1 var(--font-display);
+  letter-spacing: -0.01em;
+}
+.vcard-names {
+  margin-bottom: 8px;
+  font: italic 400 34px/1 var(--font-display);
+}
+.vcard-role {
+  margin-bottom: 28px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: .6;
+}
+.vcard-person {
+  margin-top: auto;
+}
+.vcard-person b {
+  display: block;
+  font-weight: 500;
+}
+.vcard-person span {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: .55;
+}
+.vcard-photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32px;
+  background: #2b2825;
+}
+.vcard-photo img,
+.vcard-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Square card: quote at the top, source at the bottom. */
+.vcard.is-square {
+  display: flex;
+  flex-direction: column;
+  width: 416px;
+  padding: 32px;
+}
+.vcard-source {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  font-weight: 500;
+}
+.vcard-badge {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: var(--charcoal);
+  color: var(--cream);
+  font: 400 26px/1 var(--font-display);
+}
+
+/* Photo card: the still fills the card, a gold box holds the quote over its lower half. */
+.vcard.is-photo {
+  padding: 16px;
+}
+.vcard-bg {
+  position: absolute;
+  inset: 0;
+}
+.vcard-box {
+  position: absolute;
+  inset: auto 16px 16px;
+  display: flex;
+  flex-direction: column;
+  height: 241px;
+  padding: 24px;
+  border-radius: 32px;
+  background: var(--gold);
+}
+.vcard-box .vcard-quote {
+  font-size: 30px;
+}
+
+/* ================= INVESTMENT (Spread's pricing) =================
+   Header: headline left, reassurance right, both sitting on the same bottom line (align-items: end). */
+.pricing {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 140px var(--pad-x) 100px;
+}
+.pricing-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: end;
+  margin-bottom: 48px;
+}
+.pricing-head h2 {
+  font: 400 clamp(40px, 4.6vw, 64px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.pricing-head h2 em {
+  font-style: italic;
+}
+.pricing-head > p {
+  max-width: 420px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Three equal cards. Each is a flex column so the button can sit at the bottom (margin-top: auto)
+   and every card's button lines up even when the lists are different lengths. */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.plan {
+  display: flex;
+  flex-direction: column;
+  padding: 40px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: #1a1816;
+  transition: transform .3s, box-shadow .3s, opacity .5s;
+}
+/* Cards start 20px low and invisible; script.js adds .is-in one by one, 100ms apart. */
+html.js .plan {
+  opacity: 0;
+  transform: translateY(20px);
+}
+html.js .plan.is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity .5s, transform .5s var(--ease-out), box-shadow .3s;
+}
+.plan:hover,
+html.js .plan.is-in:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Featured: Spread inverts its featured card to charcoal on a cream page; on our black page we invert the
+   other way, to ivory. Either way the eye lands here first. */
+.plan--featured {
+  border-color: var(--cream);
+  background: var(--cream);
+  color: var(--charcoal);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.45);
+}
+
+.plan-tag {
+  margin-bottom: 24px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.plan--featured .plan-tag {
+  color: #8f7333;               /* the deeper gold that reads on ivory */
+}
+.plan-name {
+  margin-bottom: 4px;
+  font: 400 30px/1.05 var(--font-display);
+  letter-spacing: -0.01em;
+}
+.plan-desc {
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.plan-amt {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 44px;
+  letter-spacing: -2px;
+  line-height: 1.1;
+}
+.plan-note {
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+}
+.plan--featured .plan-desc,
+.plan--featured .plan-note {
+  color: var(--muted);
+}
+.plan--featured .plan-note {
+  border-color: var(--border);
+}
+
+/* Ticks drawn in CSS: a gold ring with a small check inside (an inline SVG as a background image). */
+.plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+  list-style: none;
+}
+.plan-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.plan-list li::before {
+  content: "";
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  background: rgba(196, 166, 97, 0.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.2 2.2 4.8-4.8' fill='none' stroke='%23c4a661' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat;
+}
+.plan--featured .plan-list li {
+  color: var(--charcoal-soft);
+}
+.plan--featured .plan-list li::before {
+  border-color: #8f7333;
+  background-color: rgba(143, 115, 51, 0.1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.2 2.2 4.8-4.8' fill='none' stroke='%238f7333' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Outline pill that fills on hover; the featured card gets the filled one. */
+.plan-btn {
+  margin-top: auto;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 100px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  transition: background .3s, color .3s, border-color .3s;
+}
+.plan-btn:hover {
+  border-color: #fff;
+  background: #fff;
+  color: var(--charcoal);
+}
+.plan--featured .plan-btn {
+  border-color: var(--charcoal);
+  background: var(--charcoal);
+  color: var(--cream);
+}
+.plan--featured .plan-btn:hover {
+  background: #3a3632;
+}
+.plan-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.plan--featured .plan-btn:focus-visible {
+  outline-color: var(--charcoal);
+}
+
+/* ================= SMALL EVENTS (Spread's photo strip) =================
+   overflow: hidden on the section hides the photos waiting off screen. width: max-content lets the row be as
+   long as all its photos, instead of squeezing them into the screen. */
+.strip {
+  overflow: hidden;
+  padding: 140px 0 40px;
+}
+.strip-head {
+  max-width: 680px;
+  margin: 0 auto 56px;
+  padding: 0 var(--pad-x);
+  text-align: center;
+}
+.strip-head h2 {
+  margin-bottom: 16px;
+  font: 400 clamp(40px, 5vw, 72px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.strip-head h2 em {
+  font-style: italic;
+}
+.strip-head > p:not(.tag) {
+  max-width: 480px;
+  margin: 0 auto 28px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.65);
+  text-wrap: balance;
+}
+.strip-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  will-change: transform;
+}
+.strip-img {
+  flex-shrink: 0;
+  width: 320px;
+  height: 400px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #1a1816;
+}
+.strip-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ================= QUESTIONS (our Dosedrop FAQ) =================
+   Two columns from 1024px: headline left, questions right. Below that, one column. */
+.faq {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 120px var(--pad-x) 100px;
+}
+.faq-title {
+  font: 400 clamp(44px, 5vw, 68px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.faq-title em {
+  font-style: italic;
+}
+.faq-sub {
+  margin-top: 24px;
+  font-size: 20px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Each question is a soft rounded row; open rows get a little room under the answer. */
+.qa {
+  margin-bottom: 8px;
+  border-radius: 20px;
+  background: #1a1816;
+  transition: background .3s;
+}
+.qa:hover,
+.qa[open] {
+  background: #221f1c;
+}
+.qa[open] {
+  padding-bottom: 18px;
+}
+.qa summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+  cursor: pointer;
+  list-style: none;             /* hide the default ▸ triangle */
+}
+.qa summary::-webkit-details-marker {
+  display: none;
+}
+.qa summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 20px;
+}
+.qa h3 {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.qa-a {
+  padding: 0 22px;
+}
+.qa-a p {
+  max-width: 520px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.62);
+}
+.qa-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--gold);
+}
+/* "+" → "−": only the vertical stroke turns, around its own centre. */
+.qa-vbar {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: rotate .5s cubic-bezier(.4, 0, .2, 1);
+}
+.qa[open] .qa-vbar {
+  rotate: 90deg;
+}
+/* Slide the answer open (new CSS): let height animate to "auto". Browsers without it just snap open. */
+@supports (interpolate-size: allow-keywords) {
+  .qa {
+    interpolate-size: allow-keywords;
+  }
+  .qa::details-content {
+    height: 0;
+    overflow: clip;
+    transition: height .3s cubic-bezier(0, 0, .2, 1), content-visibility .3s allow-discrete;
+  }
+  .qa[open]::details-content {
+    height: auto;
+  }
+}
+@media (min-width: 1024px) {
+  .faq {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+}
+
+/* ================= CLOSING (Spread's photo-break card) =================
+   script.js animates ONLY --inset (0 → 16px) as the card arrives. Width and corners are worked out from it,
+   so they always follow the current screen size (animating `width` itself would freeze it at load size). */
+.photo-break {
+  position: relative;
+  overflow: hidden;
+  --inset: 0px;
+  width: calc(100% - 2 * var(--inset));
+  border-radius: calc(var(--inset) * 1.5);
+  height: 90vh;
+  min-height: 560px;
+  margin: 40px auto 16px;
+  background: #1a1816;          /* if the film is late you see a dark card, never a gap */
+}
+.photo-break-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+.photo-break-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--pad-x);
+  background: rgba(15, 14, 13, 0.55);
+  color: #fff;
+  text-align: center;
+}
+.photo-break h2 {
+  margin-bottom: 20px;
+  font: 400 clamp(48px, 6.4vw, 96px)/0.98 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.photo-break h2 em {
+  font-style: italic;
+}
+.photo-break-overlay > p {
+  max-width: 440px;
+  margin: 0 auto 36px;
+  font-size: 17px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.78);
+  text-wrap: balance;
+}
+
+/* ================= PULL-UP FOOTER (our Dosedrop build) =================
+   <main> is the sheet: above the footer (z-index 1 vs 0), black, with a gap under it the footer's height and a
+   shadow on its bottom edge. The body is gold, so the gap shows the gold footer fixed underneath. */
+body {
+  background: var(--gold);
+}
+main {
+  position: relative;
+  z-index: 1;
+  display: flow-root;           /* stops child margins leaking out and showing gold above the page */
+  margin-bottom: var(--footer-h);
+  background: var(--night);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+:root {
+  --footer-h: 400px;
+}
+.footer {
+  position: fixed;
+  z-index: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--footer-h);
+  overflow: hidden;
+  background: var(--gold);
+  color: var(--charcoal);
+  transition: opacity .5s cubic-bezier(.4, 0, .2, 1);
+}
+/* Hidden until the page starts lifting, so it can never peek through early (without JS it just stays visible). */
+html.js body:not([data-lifting="true"]) .footer {
+  opacity: 0;
+}
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 56px var(--pad-x) 0;
+}
+.footer p {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.7;
+}
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px 24px;
+  max-width: 560px;
+  font-size: 14px;
+  font-weight: 500;
+}
+/* Footer link: underline grows in from the left. */
+.flink {
+  position: relative;
+  color: var(--charcoal);
+  text-decoration: none;
+}
+.flink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  scale: 0 1;
+  transform-origin: left;
+  transition: scale .3s cubic-bezier(.4, 0, .2, 1);
+}
+.flink:hover::after,
+.flink:focus-visible::after {
+  scale: 1 1;
+}
+.footer .footer-credits {
+  max-width: 640px;
+  margin-top: 20px;
+  padding: 0 var(--pad-x);
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.6;
+  opacity: .7;
+}
+.footer-mark {
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.footer-mark text {
+  font: 400 240px var(--font-display);
+  letter-spacing: -0.02em;
+  fill: var(--charcoal);
+}
+
+/* Shared controls and full-screen menu: the same General Sans and warm neutrals. */
+:root {
+  --ink: var(--charcoal);
+  --ivory: var(--cream);
+  --serif: var(--font-head);
+  --sans: var(--font-body);
+  --edge: var(--pad-x);
+  --ease: var(--ease-out);
+}
+button {
+  font: inherit;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+dialog {
+  border: 0;
+}
+.menu-dialog a {
+  text-decoration: none;
+}
+button:focus-visible, a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+}
+button:active {
+  scale: .98;
+}
+.nav {
+  width: max-content;
+  max-width: min(620px, calc(100% - 24px));
+}
+.nav-links button {
+  display: block;
+  padding: 10px 16px;
+  border-radius: 100px;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, .7);
+  transition: color .3s, background .3s;
+}
+.nav-links button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, .1);
+}
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  background: transparent;
+  color: rgba(255, 255, 255, .7);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.menu-toggle span {
+  font-size: 18px;
+}
+.nav.scrolled {
+  max-width: 340px;
+}
+.nav.scrolled .menu-toggle {
+  color: rgba(255, 255, 255, .8);
+}
+#pause-button {
+  position: absolute;
+  right: var(--pad-x);
+  top: 32px;
+  z-index: 3;
+  padding: 10px 14px;
+  border-radius: 100px;
+  background: rgba(29, 27, 24, .2);
+  color: #fff;
+  font-size: 11px;
+}
+/* ================= MENU + INQUIRE PANELS =================
+   Both are full-screen native <dialog>s in the site's own look: black, Instrument Serif, gold accents. They share
+   the header (wordmark + Close) and the clip-path "wipe down" entrance (menu-in, below). */
+.menu-dialog,
+.inquire-dialog {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  background: var(--night);
+  color: #fff;
+}
+.menu-dialog[open],
+.inquire-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  animation: menu-in .6s var(--ease) both;
+}
+.inquire-dialog[open] {
+  overflow-y: auto;             /* the form can be taller than a phone screen */
+}
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px var(--pad-x);
+}
+.wordmark {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  color: #fff;
+  text-decoration: none;
+}
+.close-menu,
+.menu-header .close-inquire {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  background: transparent;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color .2s;
+}
+.close-menu:hover,
+.menu-header .close-inquire:hover {
+  color: #fff;
+}
+.close-menu > span,
+.menu-header .close-inquire > span {
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* Menu: big serif links on the left, the film preview on the right. */
+.menu-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  align-items: center;
+  gap: 7vw;
+  padding: 10px var(--pad-x) 48px;
+}
+.menu-links {
+  display: grid;
+}
+.menu-links > a {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+  padding: 4px 0 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  text-decoration: none;
+}
+.menu-links small {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+.menu-links span {
+  font: 400 clamp(44px, 5.4vw, 84px)/1.05 var(--font-display);
+  letter-spacing: -0.02em;
+  transition: translate .4s var(--ease-out), color .3s;
+}
+.menu-links em {
+  font-style: italic;
+}
+/* Hover: the word slides right a little and turns gold. */
+.menu-links > a:hover span,
+.menu-links > a:focus-visible span {
+  translate: 12px 0;
+  color: var(--gold);
+}
+.menu-preview {
+  position: relative;
+  height: min(56vh, 520px);
+  padding: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #1a1816;
+  color: #fff;
+}
+.menu-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1s var(--ease-out);
+}
+.menu-preview:hover img {
+  transform: scale(1.04);
+}
+.preview-caption {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  padding: 24px;
+  background: linear-gradient(transparent 45%, rgba(15, 14, 13, 0.75));
+  font: 400 30px/1 var(--font-display);
+  text-align: left;
+}
+.preview-caption em {
+  font-style: italic;
+}
+.preview-play {
+  margin-bottom: 4px;
+  font: 500 12px/1 var(--font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.menu-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 22px var(--pad-x);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.menu-footer div {
+  display: flex;
+  gap: 28px;
+}
+.menu-footer a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+}
+.menu-footer a:hover {
+  color: #fff;
+}
+
+/* Inquire: intro on the left, the form on the right (one column on phones). */
+.inquire-body {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 7vw;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px var(--pad-x) 64px;
+}
+.inquire-intro h2,
+.inquire-thanks h2 {
+  margin-bottom: 20px;
+  font: 400 clamp(48px, 5.4vw, 84px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.inquire-intro em,
+.inquire-thanks em {
+  font-style: italic;
+}
+.inquire-lead {
+  max-width: 420px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+}
+.inquire-steps {
+  display: grid;
+  gap: 14px;
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  list-style: none;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
+}
+.inquire-steps span {
+  display: inline-block;
+  width: 40px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+/* The form: a two-column grid; wide fields span both. Inputs are just a bottom line that turns gold on focus. */
+.inquire-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px 28px;
+  align-content: start;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  border: 0;
+}
+.field--wide {
+  grid-column: 1 / -1;
+}
+.field label,
+.field legend {
+  padding: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.field small {
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.35);
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px 0 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  font: 400 18px/1.4 var(--font-body);
+  color-scheme: dark;           /* dark date picker and dropdown */
+  transition: border-color .25s;
+}
+.field textarea {
+  resize: vertical;
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-bottom-color: var(--gold);
+}
+.field select option {
+  background: var(--night);
+}
+/* Package choices: real radio buttons, hidden, with their labels drawn as pills. Picked = filled ivory. */
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+/* Each pill is a <label> too, so undo the small spaced capitals of the field labels above. */
+.field .choice {
+  font-size: inherit;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.choice span {
+  display: inline-block;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 100px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: background .25s, color .25s, border-color .25s;
+}
+.choice span:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.choice input:checked + span {
+  border-color: var(--cream);
+  background: var(--cream);
+  color: var(--charcoal);
+}
+.choice input:focus-visible + span {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 8px;
+}
+.form-note {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+}
+/* Thank-you screen: takes the form's place. */
+.inquire-thanks {
+  align-self: center;
+}
+.inquire-thanks .inquire-lead {
+  margin-bottom: 32px;
+}
+.inquire-thanks h2:focus {
+  outline: none;
+}
+
+/* Film viewer uses the original business footage and native playback controls. */
+.film-dialog {
+  width: min(1200px, 95vw);
+  max-width: none;
+  padding: 20px;
+  color: var(--ivory);
+  background: #1b211d;
+}
+.film-dialog::backdrop {
+  background: rgba(11, 16, 12, .93);
+}
+.film-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  font-size: 10px;
+  letter-spacing: .1em;
+}
+.film-heading button {
+  background: transparent;
+  padding: 10px;
+  font-size: 13px;
+}
+#film-video {
+  display: block;
+  width: 100%;
+  max-height: 77dvh;
+  background: #111;
+}
+
+/* Responsive rules use the same changes as our Spread rebuild. */
+@media (max-width: 960px) {
+  :root {
+    --pad-x: 32px;
+  }
+  .hero-tiles {
+    display: none;
+  }
+  .feature,
+  .feature--flip {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    min-height: auto;
+    padding: 16px 0;
+  }
+  .filmmaker {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .pricing-head {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .plans {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .strip-img {
+    width: 260px;
+    height: 340px;
+  }
+  .filmmaker-text {
+    padding: 64px 32px;
+  }
+  .filmmaker-photo {
+    height: 50vh;
+  }
+  .feature-text {
+    max-width: none;
+    padding: 60px var(--pad-x) 0;
+  }
+  .feature-media,
+  .feature--flip .feature-media {
+    order: 0;
+    width: auto;
+    margin: 20px var(--pad-x);
+  }
+  .feature--flip .feature-text {
+    order: 0;
+    padding: 60px var(--pad-x) 0;
+  }
+  #pause-button {
+    top: 102px;
+    right: 20px;
+  }
+  .menu-body {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 4vw;
+  }
+  .inquire-body {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+/* Phones and small tablets: Wispr's phone cards. Wide cards stack text over a square photo. */
+@media (max-width: 767px) {
+  .voices-head {
+    padding: 100px var(--pad-x) 16px;
+  }
+  .vcard,
+  .vcard.is-wide {
+    width: min(34rem, 86vw);
+    height: auto;
+  }
+  .vcard.is-square {
+    width: min(26rem, 86vw);
+    height: 352px;
+    padding: 16px;
+  }
+  .vcard.is-wide,
+  .vcard.is-photo-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+  }
+  .vcard-text {
+    padding: 16px;
+  }
+  .vcard-text .vcard-person {
+    margin-top: 32px;
+  }
+  .vcard-quote,
+  .vcard-names {
+    font-size: 26px;
+  }
+  .vcard-box .vcard-quote {
+    font-size: 24px;
+  }
+  .vcard-photo {
+    flex: none;
+    aspect-ratio: 1;
+  }
+  .vcard.is-photo-left .vcard-photo {
+    order: 2;
+  }
+}
+@media (max-width: 600px) {
+  :root {
+    --pad-x: 24px;
+  }
+  .nav {
+    top: 12px;
+    padding: 5px 5px 5px 16px;
+  }
+  .nav-links {
+    display: none;
+  }
+  .nav-logo {
+    margin-right: 6px;
+    font-size: 15px;
+  }
+  .nav-cta {
+    font-size: 12px;
+    padding: 9px 16px;
+  }
+  .menu-toggle {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  .nav.scrolled {
+    max-width: 310px;
+    padding: 5px 5px 5px 14px;
+  }
+  .hero {
+    height: 130vh;
+  }
+  .hero-pin {
+    height: 100svh;
+  }
+  .hero-media {
+    object-position: 60% center;
+  }
+  .hero-content {
+    padding-bottom: 56px;
+  }
+  .hero-eyebrow {
+    margin-bottom: 18px;
+    font-size: 11px;
+  }
+  .hero-title {
+    font-size: clamp(44px, 13vw, 60px);
+  }
+  .hero-sub {
+    margin-bottom: 32px;
+    font-size: 15px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .camera-head {
+    top: 96px;
+  }
+  .camera-rec {
+    top: auto;
+    bottom: 24px;               /* bottom corner on phones: the heading fills the top */
+    font-size: 11px;
+  }
+  .camera-title {
+    font-size: clamp(30px, 9.3vw, 40px);   /* small enough that the italic line stays on one line */
+  }
+  .camera-lead {
+    font-size: 15px;
+  }
+  .camera-more-line {
+    font-size: clamp(30px, 8.8vw, 40px);
+  }
+  .films-intro {
+    padding: 72px var(--pad-x) 24px;
+  }
+  .films-intro h2 {
+    font-size: clamp(40px, 11vw, 52px);
+  }
+  .films-intro > p:not(.tag) {
+    font-size: 16px;
+  }
+  .feature {
+    gap: 20px;
+  }
+  .feature-text {
+    padding-top: 48px;
+  }
+  .feature h2 {
+    margin-bottom: 14px;
+    font-size: clamp(32px, 9vw, 40px);
+  }
+  .feature-text > p:not(.tag) {
+    font-size: 15px;
+  }
+  .filmmaker {
+    width: calc(100% - 16px);
+    border-radius: 16px;
+  }
+  .pricing {
+    padding: 100px var(--pad-x) 56px;
+  }
+  .strip {
+    padding-top: 100px;
+  }
+  .faq {
+    padding: 90px var(--pad-x) 64px;
+  }
+  :root {
+    --footer-h: 350px;
+  }
+  .photo-break {
+    height: 80vh;
+    min-height: 520px;
+  }
+  .photo-break h2 {
+    font-size: clamp(32px, 9.4vw, 48px);   /* each line of the headline stays whole */
+  }
+  .photo-break-overlay > p {
+    margin-bottom: 28px;
+    font-size: 15px;
+  }
+  .footer-row {
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 44px;
+  }
+  .footer-links {
+    justify-content: flex-start;
+  }
+  .faq-sub {
+    font-size: 17px;
+  }
+  .qa h3 {
+    font-size: 16px;
+  }
+  .pricing-head {
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .filmmaker-text {
+    padding: 48px 24px;
+  }
+  .filmmaker h2 {
+    font-size: clamp(34px, 9.5vw, 42px);
+  }
+  .filmmaker-lead {
+    font-size: 15px;
+  }
+  .filmmaker-photo {
+    height: 40vh;
+  }
+  .steps li {
+    padding-right: 10px;
+  }
+  .steps li + li {
+    padding-left: 10px;
+  }
+  .step-title {
+    font-size: 14px;
+  }
+  .step-desc {
+    font-size: 12px;
+  }
+  .feature-media,
+  .feature--flip .feature-media {
+    margin: 16px 12px;          /* nearly edge to edge */
+    border-radius: 16px;
+  }
+  .feature--flip .feature-text {
+    padding-top: 48px;
+  }
+  .btn-light {
+    padding: 14px 32px;
+    font-size: 14px;
+  }
+  .btn-ghost {
+    font-size: 13px;
+  }
+  .menu-body {
+    display: flex;
+    align-items: center;
+    padding: 10px var(--pad-x) 32px;
+  }
+  .menu-links {
+    width: 100%;
+  }
+  .menu-links span {
+    font-size: clamp(36px, 11vw, 48px);
+  }
+  .menu-preview {
+    display: none;
+  }
+  .menu-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .inquire-body {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding-bottom: 48px;
+  }
+  .inquire-intro h2,
+  .inquire-thanks h2 {
+    font-size: clamp(40px, 11vw, 52px);
+  }
+  .inquire-steps {
+    margin-top: 28px;
+  }
+  .inquire-form {
+    grid-template-columns: 1fr;
+  }
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .film-heading > span {
+    max-width: 180px;
+    line-height: 1.6;
+  }
+}
+@media (max-width: 380px) {
+  :root {
+    --pad-x: 20px;
+  }
+  .hero-title {
+    font-size: 42px;
+  }
+  .hero-content {
+    padding-bottom: 44px;
+  }
+}
+@keyframes menu-in {
+  from {
+  clip-path: inset(0 0 100%);
+}
+  to {
+  clip-path: inset(0);
+}
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    height: 100svh;
+  }
+  .hero-pin {
+    position: relative;
+    height: 100svh;
+  }
+  .hero-tiles {
+    display: none;
+  }
+  .camera-scene {
+    height: auto;
+  }
+  .camera-stage {
+    position: relative;
+    height: auto;
+    padding: 120px 0 80px;
+  }
+  .camera-canvas,
+  .camera-rec {
+    display: none;
+  }
+  .camera-head,
+  .camera-more {
+    position: static;
+    translate: none;
+    opacity: 1;
+    margin: 0 auto;
+  }
+  .camera-in,
+  .camera-more-line:not(:first-child) {
+    opacity: 1;
+    translate: none;
+  }
+  .camera-more {
+    margin-top: 56px;
+  }
+  .camera-more-line {
+    color: #fff;
+  }
+  .voices-stage {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    height: auto;
+    padding: 64px 20px 96px;
+  }
+  .vcard {
+    position: relative;
+    top: auto;
+    left: auto;
+    translate: none;
+  }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html.js .w > span {
+    transform: none;
+  }
+  html.js .plan {
+    opacity: 1;
+    transform: none;
+  }
+  html.js .hero-eyebrow, html.js .hero-sub, html.js .hero-actions {
+    opacity: 1;
+    transform: none;
+  }
+}
